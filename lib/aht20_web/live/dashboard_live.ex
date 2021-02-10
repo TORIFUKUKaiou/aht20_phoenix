@@ -20,10 +20,10 @@ defmodule Aht20Web.DashboardLive do
       <div class="stats">
         <div class="stat">
           <span class="value">
-            <%= @temperature %>度
+            <%= @temperature %>℃
           </span>
           <span class="name">
-            温度
+            Temperature
           </span>
         </div>
         <div class="stat">
@@ -31,7 +31,7 @@ defmodule Aht20Web.DashboardLive do
             <%= @humidity %>%
           </span>
           <span class="name">
-            湿度
+            Humidity
           </span>
         </div>
       </div>
