@@ -12,8 +12,6 @@ defmodule Aht20Web.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
-
-    resources "/values", Aht20Web.ValueController, only: [:create, :show]
   end
 
   scope "/", Aht20Web do
@@ -21,6 +19,12 @@ defmodule Aht20Web.Router do
 
     live "/", PageLive, :index
     live "/aht20-dashboard", DashboardLive
+  end
+
+  scope "/api", Aht20Web do
+    pipe_through :api
+
+    resources "/values", ValueController, only: [:create, :show]
   end
 
   # Other scopes may use custom stacks.
