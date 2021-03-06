@@ -20,10 +20,10 @@ defmodule Aht20Web.DashboardLive do
       <div class="stats">
         <div class="stat">
           <span class="value">
-            <%= @temperature %>度
+            <%= @temperature %>`C
           </span>
           <span class="name">
-            温度
+            Temperature
           </span>
         </div>
         <div class="stat">
@@ -31,14 +31,13 @@ defmodule Aht20Web.DashboardLive do
             <%= @humidity %>%
           </span>
           <span class="name">
-            湿度
+            Humidity
           </span>
         </div>
       </div>
-    </div>
 
-    <p><a href="https://qiita.com/torifukukaiou/items/5876bc4576e7b7991347">AHT20で温度湿度を取得して全世界に惜しげもなく公開する(Elixir/Nerves/Phoenix)</a></p>
-    <p><a href="https://twitter.com/hashtag/%E5%A4%A7%E6%99%A6%E6%97%A5%E3%83%8F%E3%83%83%E3%82%AB%E3%82%BD%E3%83%B3">#大晦日ハッカソン</a></p>
+      <p><a href="https://qiita.com/torifukukaiou/items/5876bc4576e7b7991347">Article</a></p>
+    </div>
     """
   end
 
