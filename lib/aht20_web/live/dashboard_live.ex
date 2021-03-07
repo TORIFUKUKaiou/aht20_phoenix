@@ -43,7 +43,9 @@ defmodule Aht20Web.DashboardLive do
         </div>
       </div>
 
-      <%= @time %>
+      <p class="m-4 font-semibold text-indigo-800">
+        <%= @time %>
+      </p>
       <p><a href="https://qiita.com/torifukukaiou/items/5876bc4576e7b7991347">Article</a></p>
     </div>
     """
