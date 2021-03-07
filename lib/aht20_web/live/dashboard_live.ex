@@ -15,8 +15,7 @@ defmodule Aht20Web.DashboardLive do
       |> assign(locale: fetch_locale(socket))
       |> assign(timezone: fetch_timezone(socket))
       |> assign(timezone_offset: fetch_timezone_offset(socket))
-
-    socket = assign_stats(socket)
+      |> assign_stats()
 
     {:ok, socket}
   end
@@ -65,7 +64,7 @@ defmodule Aht20Web.DashboardLive do
       )
       |> update(
         :time,
-        fn _ -> format_time(time, socket) end
+        fn _ -> format_time(time, socket.assigns.timezone) end
       )
 
     {:noreply, socket}
@@ -77,13 +76,13 @@ defmodule Aht20Web.DashboardLive do
     assign(socket,
       temperature: temperature,
       humidity: humidity,
-      time: format_time(time, socket)
+      time: format_time(time, socket.assigns.timezone)
     )
   end
 
-  defp format_time(time, socket) do
+  defp format_time(time, timezone) do
     Timex.from_unix(time)
-    |> Aht20.Cldr.format_time(locale: "en-US", timezone: socket.assigns.timezone)
+    |> Aht20.Cldr.format_time(locale: "en-US", timezone: timezone)
   end
 
   defp fetch_locale(socket) do
