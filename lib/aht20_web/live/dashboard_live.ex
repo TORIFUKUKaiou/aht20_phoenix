@@ -8,9 +8,7 @@ defmodule Aht20Web.DashboardLive do
   @default_timezone_offset 9
 
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      :timer.send_interval(1000, self(), :tick)
-    end
+    if connected?(socket), do: Aht20.Measurements.subscribe()
 
     socket =
       socket
@@ -52,8 +50,22 @@ defmodule Aht20Web.DashboardLive do
     """
   end
 
-  def handle_info(:tick, socket) do
-    socket = assign_stats(socket)
+  def handle_info({:value_created, value}, socket) do
+    socket =
+      update(
+        socket,
+        :temperature,
+        fn _ -> value.temperature end
+      )
+      |> update(
+        :humidity,
+        fn _ -> value.humidity end
+      )
+      |> update(
+        :time,
+        fn _ -> Timex.from_unix(value.time) |> Aht20.Cldr.format_time() end
+      )
+
     {:noreply, socket}
   end
 
