@@ -3,7 +3,7 @@ defmodule Aht20Web.DashboardLive do
 
   alias Aht20.Values
 
-  @default_locale "ja"
+  @default_locale "en-US"
   @default_timezone "Asia/Tokyo"
   @default_timezone_offset 9
 
@@ -51,19 +51,21 @@ defmodule Aht20Web.DashboardLive do
   end
 
   def handle_info({:value_created, value}, socket) do
+    %{temperature: temperature, humidity: humidity, time: time} = value
+
     socket =
       update(
         socket,
         :temperature,
-        fn _ -> value.temperature end
+        fn _ -> temperature end
       )
       |> update(
         :humidity,
-        fn _ -> value.humidity end
+        fn _ -> humidity end
       )
       |> update(
         :time,
-        fn _ -> Timex.from_unix(value.time) |> Aht20.Cldr.format_time() end
+        fn _ -> format_time(time, socket) end
       )
 
     {:noreply, socket}
@@ -75,8 +77,13 @@ defmodule Aht20Web.DashboardLive do
     assign(socket,
       temperature: temperature,
       humidity: humidity,
-      time: Timex.from_unix(time) |> Aht20.Cldr.format_time()
+      time: format_time(time, socket)
     )
+  end
+
+  defp format_time(time, socket) do
+    Timex.from_unix(time)
+    |> Aht20.Cldr.format_time(locale: "en-US", timezone: socket.assigns.timezone)
   end
 
   defp fetch_locale(socket) do
