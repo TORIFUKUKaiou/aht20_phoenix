@@ -3,10 +3,20 @@ defmodule Aht20Web.DashboardLive do
 
   alias Aht20.Values
 
+  @default_locale "ja"
+  @default_timezone "Asia/Tokyo"
+  @default_timezone_offset 9
+
   def mount(_params, _session, socket) do
     if connected?(socket) do
       :timer.send_interval(1000, self(), :tick)
     end
+
+    socket =
+      socket
+      |> assign(locale: fetch_locale(socket))
+      |> assign(timezone: fetch_timezone(socket))
+      |> assign(timezone_offset: fetch_timezone_offset(socket))
 
     socket = assign_stats(socket)
 
@@ -36,6 +46,7 @@ defmodule Aht20Web.DashboardLive do
         </div>
       </div>
 
+      <%= @time %>
       <p><a href="https://qiita.com/torifukukaiou/items/5876bc4576e7b7991347">Article</a></p>
     </div>
     """
@@ -47,11 +58,36 @@ defmodule Aht20Web.DashboardLive do
   end
 
   defp assign_stats(socket) do
-    {temperature, humidity} = Values.get()
+    {temperature, humidity, time} = Values.get()
 
     assign(socket,
       temperature: temperature,
-      humidity: humidity
+      humidity: humidity,
+      time: Timex.from_unix(time) |> Aht20.Cldr.format_time()
     )
+  end
+
+  defp fetch_locale(socket) do
+    if connected?(socket) do
+      get_connect_params(socket)["locale"]
+    else
+      @default_locale
+    end
+  end
+
+  defp fetch_timezone(socket) do
+    if connected?(socket) do
+      get_connect_params(socket)["timezone"]
+    else
+      @default_timezone
+    end
+  end
+
+  defp fetch_timezone_offset(socket) do
+    if connected?(socket) do
+      get_connect_params(socket)["timezone_offset"]
+    else
+      @default_timezone_offset
+    end
   end
 end
