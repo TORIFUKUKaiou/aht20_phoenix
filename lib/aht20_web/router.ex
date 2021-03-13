@@ -19,6 +19,7 @@ defmodule Aht20Web.Router do
 
     live "/", PageLive, :index
     live "/aht20-dashboard", DashboardLive
+    live "/yubaba", YubabaLive
   end
 
   scope "/api", Aht20Web do
