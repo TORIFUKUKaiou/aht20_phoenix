@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <%= csrf_meta_tag() %>
     <%= live_title_tag assigns[:page_title] || "Aht20", suffix: " · Phoenix Framework" %>
-    <link href="https://fonts.googleapis.com/css?family=Press+Start+2P" rel="stylesheet">
     <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
     <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+
+    <link rel="preload" href="https://www.torifuku-kaiou.app/img/chihiro016.jpg" as="image">
+    <link rel="preload" href="https://www.torifuku-kaiou.app/img/chihiro017.jpg" as="image">
   </head>
   <body>
     <header>
@@ -22,9 +24,7 @@
           </ul>
         </nav>
         <a href="https://phoenixframework.org/" class="phx-logo">
-          <span><i class="nes-jp-logo"></i></span>
-          <span style="font-weight: bold; font-size: xx-large;">Phoenix</span>
-          <span>Framework</span>
+          <img src="<%= Routes.static_path(@conn, "/images/phoenix.png") %>" alt="Phoenix Framework Logo"/>
         </a>
       </section>
     </header>

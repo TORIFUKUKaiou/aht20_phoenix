@@ -4,9 +4,13 @@ defmodule Aht20.Values do
     |> handle_get()
   end
 
-  defp handle_get(nil), do: {0, 0}
+  defp handle_get(nil), do: {0, 0, 0}
 
-  defp handle_get(%Aht20.Measurements.Value{temperature: temperature, humidity: humidity}) do
-    {temperature, humidity}
+  defp handle_get(%Aht20.Measurements.Value{
+         temperature: temperature,
+         humidity: humidity,
+         time: time
+       }) do
+    {temperature, humidity, time}
   end
 end

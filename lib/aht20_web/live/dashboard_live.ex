@@ -3,12 +3,19 @@ defmodule Aht20Web.DashboardLive do
 
   alias Aht20.Values
 
-  def mount(_params, _session, socket) do
-    if connected?(socket) do
-      :timer.send_interval(1000, self(), :tick)
-    end
+  @default_locale "en-US"
+  @default_timezone "Asia/Tokyo"
+  @default_timezone_offset 9
 
-    socket = assign_stats(socket)
+  def mount(_params, _session, socket) do
+    if connected?(socket), do: Aht20.Measurements.subscribe()
+
+    socket =
+      socket
+      |> assign(locale: fetch_locale(socket))
+      |> assign(timezone: fetch_timezone(socket))
+      |> assign(timezone_offset: fetch_timezone_offset(socket))
+      |> assign_stats()
 
     {:ok, socket}
   end
@@ -20,7 +27,7 @@ defmodule Aht20Web.DashboardLive do
       <div class="stats">
         <div class="stat">
           <span class="value">
-            <%= @temperature %>℃
+            <%= @temperature %>`C
           </span>
           <span class="name">
             Temperature
@@ -35,24 +42,72 @@ defmodule Aht20Web.DashboardLive do
           </span>
         </div>
       </div>
-    </div>
 
-    <p><a href="https://qiita.com/torifukukaiou/items/5876bc4576e7b7991347">AHT20で温度湿度を取得して全世界に惜しげもなく公開する(Elixir/Nerves/Phoenix)</a></p>
-    <p><a href="https://twitter.com/hashtag/%E5%A4%A7%E6%99%A6%E6%97%A5%E3%83%8F%E3%83%83%E3%82%AB%E3%82%BD%E3%83%B3">#大晦日ハッカソン</a></p>
+      <p class="m-4 font-semibold text-indigo-800">
+        <%= @time %>
+      </p>
+      <p><a href="https://qiita.com/torifukukaiou/items/5876bc4576e7b7991347">Article</a></p>
+    </div>
     """
   end
 
-  def handle_info(:tick, socket) do
-    socket = assign_stats(socket)
+  def handle_info({:value_created, value}, socket) do
+    %{temperature: temperature, humidity: humidity, time: time} = value
+
+    socket =
+      update(
+        socket,
+        :temperature,
+        fn _ -> temperature end
+      )
+      |> update(
+        :humidity,
+        fn _ -> humidity end
+      )
+      |> update(
+        :time,
+        fn _ -> format_time(time, socket.assigns.timezone) end
+      )
+
     {:noreply, socket}
   end
 
   defp assign_stats(socket) do
-    {temperature, humidity} = Values.get()
+    {temperature, humidity, time} = Values.get()
 
     assign(socket,
       temperature: temperature,
-      humidity: humidity
+      humidity: humidity,
+      time: format_time(time, socket.assigns.timezone)
     )
+  end
+
+  defp format_time(time, timezone) do
+    Timex.from_unix(time)
+    |> Aht20.Cldr.format_time(locale: "en-US", timezone: timezone)
+  end
+
+  defp fetch_locale(socket) do
+    if connected?(socket) do
+      get_connect_params(socket)["locale"]
+    else
+      @default_locale
+    end
+  end
+
+  defp fetch_timezone(socket) do
+    if connected?(socket) do
+      get_connect_params(socket)["timezone"]
+    else
+      @default_timezone
+    end
+  end
+
+  defp fetch_timezone_offset(socket) do
+    if connected?(socket) do
+      get_connect_params(socket)["timezone_offset"]
+    else
+      @default_timezone_offset
+    end
   end
 end

@@ -8,6 +8,10 @@ defmodule Aht20.Measurements do
 
   alias Aht20.Measurements.Value
 
+  def subscribe do
+    Phoenix.PubSub.subscribe(Aht20.PubSub, "values")
+  end
+
   @doc """
   Returns the list of values.
 
@@ -57,6 +61,7 @@ defmodule Aht20.Measurements do
     %Value{}
     |> Value.changeset(attrs)
     |> Repo.insert()
+    |> broadcast(:value_created)
   end
 
   @doc """
@@ -76,6 +81,18 @@ defmodule Aht20.Measurements do
     |> Value.changeset(attrs)
     |> Repo.update()
   end
+
+  def broadcast({:ok, value}, event) do
+    Phoenix.PubSub.broadcast(
+      Aht20.PubSub,
+      "values",
+      {event, value}
+    )
+
+    {:ok, value}
+  end
+
+  def broadcast({:error, _reason} = error, _event), do: error
 
   @doc """
   Deletes a value.
